@@ -1,5 +1,5 @@
-import prisma from "@/lib/prisma"
-import { getOriginalUrl, getTopShortUrls } from "@/utils/redis"
+import prisma from "@/lib/prisma.js"
+import { getOriginalUrl, getTopShortUrls } from "@/utils/redis.js"
 
 export default async function handler(req, res) {
     if (req.method === "GET") {

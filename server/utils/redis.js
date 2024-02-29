@@ -1,9 +1,9 @@
 import Redis from "ioredis"
-import prisma from "./prisma"
+import prisma from "./prisma.js"
 
 const redis = new Redis(process.env.REDIS_URI)
 
-async function getOriginalUrl(shortUrl) {
+export const getOriginalUrl = async (shortUrl) => {
     const cachedUrl = await redis.get(shortUrl)
 
     if (cachedUrl) {
@@ -35,7 +35,7 @@ async function cacheTopShortUrls(topUrls) {
     await pipeline.exec()
 }
 
-async function getTopShortUrls() {
+export const getTopShortUrls = async () => {
     const topShortUrls = await redis.zrevrange("topShortUrls", 0, 49)
 
     if (topShortUrls.length > 0) {
@@ -53,5 +53,3 @@ async function getTopShortUrls() {
 
     return topUrlsFromDb.map((url) => url.shortUrl)
 }
-
-export { getOriginalUrl, getTopShortUrls }
