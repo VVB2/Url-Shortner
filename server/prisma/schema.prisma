@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model shortenUrls {
+  id                  String   @id @default(uuid())
+  originalUrl         String
+  shortUrl            String   @unique
+  views               Int      @default(0)
+  createdAt           DateTime @default(now())
+  expirationDate      DateTime @default(dbgenerated("NOW() + interval '1 year'"))
+  isPasswordProtected Boolean  @default(false)
+  password            String?
+
+  Analytics Analytics[]
+}
+
+model Analytics {
+  id           String       @id @default(uuid())
+  timestamp    DateTime     @default(now())
+  ipAddress    String?
+  country      String?
+  city         String?
+  shortenUrlId String?
+  userAgentId  String?
+  shortenUrl   shortenUrls? @relation(fields: [shortenUrlId], references: [id])
+  userAgent    UserAgent?   @relation(fields: [userAgentId], references: [id])
+
+  @@index([shortenUrlId], name: "shortenUrlId_index")
+  @@index([timestamp], name: "timestamp_index")
+}
+
+model UserAgent {
+  id         String  @id @default(uuid())
+  browser    String?
+  deviceType String?
+
+  Analytics Analytics[]
+}

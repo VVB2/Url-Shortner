@@ -4,6 +4,11 @@ import { getOriginalUrl, getTopShortUrls } from "@/utils/redis"
 export default async function handler(req, res) {
     if (req.method === "GET") {
         try {
+            const ipAddress = (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress ||
+                req.connection.socket.remoteAddress
+
             const shortUrl = req.url.split("/").pop()
 
             if (!shortUrl) {

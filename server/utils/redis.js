@@ -1,5 +1,5 @@
 import Redis from "ioredis"
-import prisma from "@/lib/prisma"
+import prisma from "./prisma"
 
 const redis = new Redis(process.env.REDIS_URI)
 
@@ -21,7 +21,7 @@ async function getOriginalUrl(shortUrl) {
         return urlEntry.originalUrl
     }
 
-    return null 
+    return null
 }
 
 async function cacheTopShortUrls(topUrls) {
@@ -43,8 +43,8 @@ async function getTopShortUrls() {
     }
 
     const topUrlsFromDb = await prisma.shortenUrls.findMany({
-        take    : 50,
-        orderBy : {
+        take: 50,
+        orderBy: {
             views: "desc",
         },
     })
