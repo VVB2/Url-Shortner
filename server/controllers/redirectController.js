@@ -1,10 +1,10 @@
-import axios from "axios";
+import axios from "axios"
 import prisma from "../utils/prisma.js"
-import { getOriginalUrl, getTopShortUrls } from "../utils/redis.js"
+import { getOriginalUrl } from "../utils/redis.js"
 
 export const redirectURL = async (req, res) => {
     try {
-        const { browser, os: deviceType } = req.useragent;
+        const { browser, os: deviceType } = req.useragent
         const ipAddress = "133.25.36.24" || req.clientIp
         const geoLocationResponse = await axios.get(`http://ip-api.com/json/${ipAddress}`)
         const { country, city } = geoLocationResponse.data
@@ -20,13 +20,13 @@ export const redirectURL = async (req, res) => {
         if (originalUrl) {
             await prisma.shortenUrls.update({
                 where: {
-                    shortUrl,
+                    shortUrl
                 },
                 data: {
                     views: {
-                        increment: 1,
-                    },
-                },
+                        increment: 1
+                    }
+                }
             })
 
             await prisma.Analytics.create({
@@ -37,10 +37,8 @@ export const redirectURL = async (req, res) => {
                     browser,
                     deviceType,
                     shortenUrlId: shortUrl
-                },
-            });
-
-            await getTopShortUrls()
+                }
+            })
 
             return res.redirect(originalUrl)
         }

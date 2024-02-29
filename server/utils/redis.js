@@ -12,19 +12,18 @@ export const getOriginalUrl = async (shortUrl) => {
 
     const urlEntry = await prisma.shortenUrls.findUnique({
         where: {
-            shortUrl,
-        },
+            shortUrl
+        }
     })
 
     if (urlEntry) {
-        await redis.set(shortUrl, urlEntry.originalUrl)
         return urlEntry.originalUrl
     }
 
     return null
 }
 
-async function cacheTopShortUrls(topUrls) {
+const cacheTopShortUrls = async (topUrls) => {
     await redis.flushall()
     const pipeline = redis.pipeline()
 
@@ -36,17 +35,11 @@ async function cacheTopShortUrls(topUrls) {
 }
 
 export const getTopShortUrls = async () => {
-    const topShortUrls = await redis.zrevrange("topShortUrls", 0, 49)
-
-    if (topShortUrls.length > 0) {
-        return topShortUrls
-    }
-
     const topUrlsFromDb = await prisma.shortenUrls.findMany({
-        take: 50,
-        orderBy: {
-            views: "desc",
-        },
+        take    : 50,
+        orderBy : {
+            views: "desc"
+        }
     })
 
     await cacheTopShortUrls(topUrlsFromDb)
